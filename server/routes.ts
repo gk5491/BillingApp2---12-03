@@ -1636,6 +1636,9 @@ router.patch("/invoices/:id/status", authenticate, async (req, res) => {
 });
 router.delete("/invoices/:id", authenticate, async (req, res) => {
   try {
+    await db.query`DELETE FROM payment_allocations WHERE invoice_id = ${req.params.id}`;
+    await db.query`UPDATE payments_received SET invoice_id = NULL WHERE invoice_id = ${req.params.id}`;
+    await db.query`UPDATE credit_notes SET invoice_id = NULL WHERE invoice_id = ${req.params.id}`;
     await db.query`DELETE FROM invoice_items WHERE invoice_id = ${req.params.id}`;
     await db.query`DELETE FROM invoices WHERE id = ${req.params.id}`;
     res.json({ success: true });
@@ -1730,6 +1733,8 @@ router.patch("/purchase-orders/:id/status", authenticate, async (req, res) => {
 });
 router.delete("/purchase-orders/:id", authenticate, async (req, res) => {
   try {
+    await db.query`UPDATE bills SET purchase_order_id = NULL WHERE purchase_order_id = ${req.params.id}`;
+    await db.query`DELETE FROM purchase_order_items WHERE purchase_order_id = ${req.params.id}`;
     await db.query`DELETE FROM purchase_orders WHERE id = ${req.params.id}`;
     res.json({ success: true });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
@@ -1826,6 +1831,9 @@ router.patch("/bills/:id/status", authenticate, async (req, res) => {
 });
 router.delete("/bills/:id", authenticate, async (req, res) => {
   try {
+    await db.query`UPDATE payments_made SET bill_id = NULL WHERE bill_id = ${req.params.id}`;
+    await db.query`UPDATE vendor_credits SET bill_id = NULL WHERE bill_id = ${req.params.id}`;
+    await db.query`UPDATE purchase_returns SET bill_id = NULL WHERE bill_id = ${req.params.id}`;
     await db.query`DELETE FROM bill_items WHERE bill_id = ${req.params.id}`;
     await db.query`DELETE FROM bills WHERE id = ${req.params.id}`;
     res.json({ success: true });
@@ -2094,6 +2102,7 @@ router.patch("/quotations/:id/status", authenticate, async (req, res) => {
 });
 router.delete("/quotations/:id", authenticate, async (req, res) => {
   try {
+    await db.query`UPDATE sales_orders SET quotation_id = NULL WHERE quotation_id = ${req.params.id}`;
     await db.query`DELETE FROM quotation_items WHERE quotation_id = ${req.params.id}`;
     await db.query`DELETE FROM quotations WHERE id = ${req.params.id}`;
     res.json({ success: true });
@@ -2188,6 +2197,8 @@ router.patch("/sales-orders/:id/status", authenticate, async (req, res) => {
 });
 router.delete("/sales-orders/:id", authenticate, async (req, res) => {
   try {
+    await db.query`UPDATE delivery_challans SET sales_order_id = NULL WHERE sales_order_id = ${req.params.id}`;
+    await db.query`UPDATE invoices SET sales_order_id = NULL WHERE sales_order_id = ${req.params.id}`;
     await db.query`DELETE FROM sales_order_items WHERE sales_order_id = ${req.params.id}`;
     await db.query`DELETE FROM sales_orders WHERE id = ${req.params.id}`;
     res.json({ success: true });

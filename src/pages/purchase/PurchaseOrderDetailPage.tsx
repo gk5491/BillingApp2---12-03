@@ -27,9 +27,12 @@ export default function PurchaseOrderDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: () => purchaseOrdersApi.delete(id!),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["purchase_orders"] });
+      queryClient.invalidateQueries({ queryKey: ["bills"] });
       toast({ title: "Deleted" });
       navigate("/purchase/orders");
     },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const convertToBill = useMutation({

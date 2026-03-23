@@ -27,9 +27,12 @@ export default function SalesOrderDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: () => salesOrdersApi.delete(id!),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sales_orders"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       toast({ title: "Deleted" });
       navigate("/sales/orders");
     },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const convertToInv = useMutation({

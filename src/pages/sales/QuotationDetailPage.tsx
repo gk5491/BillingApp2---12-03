@@ -27,9 +27,12 @@ export default function QuotationDetailPage() {
   const deleteMutation = useMutation({
     mutationFn: () => quotationsApi.delete(id!),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["quotations"] });
+      queryClient.invalidateQueries({ queryKey: ["sales_orders"] });
       toast({ title: "Quotation deleted" });
       navigate("/sales/quotations");
     },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const convertToSO = useMutation({

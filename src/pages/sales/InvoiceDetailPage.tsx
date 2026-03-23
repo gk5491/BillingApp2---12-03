@@ -23,7 +23,12 @@ export default function InvoiceDetailPage() {
 
   const deleteMutation = useMutation({
     mutationFn: () => invoicesApi.delete(id!),
-    onSuccess: () => { toast({ title: "Invoice deleted" }); navigate("/sales/invoices"); },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      toast({ title: "Invoice deleted" });
+      navigate("/sales/invoices");
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const items = (invoice?.items || []).map((li: any) => ({
